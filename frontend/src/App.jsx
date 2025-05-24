@@ -45,9 +45,25 @@ function App() {
 
   const handleStop=()=>{
     stopAssistant()
-    //get call details
+    getCallDetails()
   }
 
+  //connect frontend and backend
+  const getCallDetails =(interval = 3000)=>{
+    setLoadingResult(true)
+    fetch("/call-details?call_id="+ callId)
+    .then((response)=>response.json())
+    .then((data)=>{
+      if(data.analysis && data.summary){
+        console.log(data)
+        setCallResult(data)
+        setLoadingResult(false)
+      }
+      else{
+        setTimeout(()=>getCallDetails(interval),interval)
+      }
+    }).catch((error)=>alert(error))
+  }
   const showForm = !loading && !started && !loadingResult && !callResult
   const allFieldsFilled= firstName && lastName && email && phoneNumber
   return (
@@ -94,6 +110,13 @@ function App() {
         ) }
         </>
       }
+    {loadingResult && <p>Loading call details... please wait</p>}
+     {!loadingResult && callResult && (
+        <div className="call-result">
+          <p>Qualified: {callResult.analysis.structuredData.is_qualified.toString()}</p>
+          <p>{callResult.summary}</p>
+        </div>
+      )}
     {(loading || loadingResult) && <div className='loading'></div>}
     {started && (
       <ActiveCallDetails
