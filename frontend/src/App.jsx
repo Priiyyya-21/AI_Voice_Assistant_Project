@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {vapi,startAssistant,stopAssistant} from "./ai"
-
+import ActiveCallDetails from './call/ActiveCallDetail';
 
 function App() {
    const [started, setStarted] = useState(false);
@@ -95,6 +95,13 @@ function App() {
         </>
       }
     {(loading || loadingResult) && <div className='loading'></div>}
+    {started && (
+      <ActiveCallDetails
+        assistantIsSpeaking={assistantIsSpeaking}
+        volumeLevel={volumeLevel}
+        endCallCallback={handleStop}
+      />
+    )}
     </div>
   )
 }
